@@ -6,7 +6,7 @@
 /*   By: vfrants <vfrants@student.42vienna.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 23:16:29 by vfrants           #+#    #+#             */
-/*   Updated: 2024/03/17 22:57:50 by vfrants          ###   ########.fr       */
+/*   Updated: 2024/03/17 23:02:18 by vfrants          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,14 +151,14 @@ int main(int argc, char **argv)
 
 	if (argc != 2 || argv[1] == NULL || argv[1][0] == '\0')
 	{
-		printf("Usage: ./%s <filename>\n", argv[0]);
+		printf("Usage: %s <filename>\n", argv[0]);
 		return 1;
 	}
 
 	char *extension = strrchr(argv[1], '.');
 	if (NULL == extension)
 	{
-		printf("Error: Please enter valid filename!");
+		printf("Error: Please enter valid filename!\n");
 		exit(1);
 	}
 	if (strncmp(extension, ".mfa", 4) != 0 ||
