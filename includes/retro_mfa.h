@@ -9,6 +9,7 @@
 # include <stdint.h>
 # include <stdlib.h>
 # include <string.h>
+# include <signal.h>
 # include <unistd.h>
 
 typedef struct s_list t_list;
@@ -17,6 +18,7 @@ typedef struct s_image
 {
 	size_t	width;
 	size_t	height;
+	void	*win_ptr;
 	void	*img_ptr;
 	char	*data;
 }	t_image;
@@ -30,7 +32,6 @@ typedef struct s_input
 typedef struct s_data // instead of thousands variables
 {
 	void	*mlx_ptr;
-	void	*win_ptr;
 	size_t	nb_images;
 	t_list	*images;
 	t_input	input;
@@ -44,6 +45,7 @@ typedef struct s_list
 
 # define HEXA "0123456789ABCDEF"
 # define ABS(x) (x < 0 ? -1 * x : x)
+# define TO_INT(x) ((255 + x) % 255)
 
 # define BUFFER_SIZE 1024
 

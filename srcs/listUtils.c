@@ -6,11 +6,13 @@
 /*   By: vfrants <vfrants@student.42vienna.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/16 22:50:42 by vfrants           #+#    #+#             */
-/*   Updated: 2024/03/16 22:51:39 by vfrants          ###   ########.fr       */
+/*   Updated: 2024/03/17 17:53:36 by vfrants          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/retro_mfa.h"
+#include <mlx.h>
+#include <stdio.h>
 
 t_list	*createNode(void *mlx_img, char *data, size_t width, size_t height)
 {
@@ -50,10 +52,12 @@ void	deleteList(t_data *data)
 {
 	t_list *tmp;
 
+
 	while (data->images)
 	{
 		tmp = data->images;
 		data->images = data->images->next;
+		mlx_destroy_window(data->mlx_ptr, tmp->content.win_ptr);
 		mlx_destroy_image(data->mlx_ptr, tmp->content.img_ptr);
 		free(tmp);
 	}

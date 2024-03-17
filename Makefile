@@ -44,11 +44,11 @@ re		:
 
 run		:
 		$(MAKE) re
-		./$(NAME)
+		./$(NAME) mfa/brown.mfa
 
 test	:
 		$(MAKE) re
-		valgrind --track-fds=yes --leak-check=full --show-leak-kinds=all ./$(NAME)
+		valgrind --track-fds=yes --leak-check=full --show-leak-kinds=all ./$(NAME) mfa/brown.mfa
 
 -include $(DEPS)
 
