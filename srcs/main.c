@@ -6,7 +6,7 @@
 /*   By: miheider <miheider@42>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 23:16:29 by vfrants           #+#    #+#             */
-/*   Updated: 2024/03/17 21:47:22 by miheider         ###   ########.fr       */
+/*   Updated: 2024/03/17 22:19:53 by miheider         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,13 @@ int main(int argc, char **argv)
 	}
 
 	char *extension = strrchr(argv[1], '.');
-	if (strncmp(extension, ".mfa", 4) != 0 || (strlen(argv[1]) <= 4) || strlen(extension) < 4)
+	if (NULL == extension)
+	{
+		printf("Error: Please enter valid filename!");
+		exit(1);
+	}
+	if (strncmp(extension, ".mfa", 4) != 0 ||
+		(strlen(argv[1]) <= 4) || strlen(extension) != 4)
 	{
 		printf("Error: only '.mfa' files.\n");
 		exit(1);
