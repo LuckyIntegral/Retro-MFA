@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: miheider <miheider@42>                     +#+  +:+       +#+        */
+/*   By: vfrants <vfrants@student.42vienna.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 23:16:29 by vfrants           #+#    #+#             */
-/*   Updated: 2024/03/17 22:19:53 by miheider         ###   ########.fr       */
+/*   Updated: 2024/03/17 22:57:50 by vfrants          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,56 @@ int	hook_destroy(void)
 	return 0;
 }
 
-void	fillImage555(char *image, const char *content, int width, int height)
+void	fillImage888(char *image, const unsigned char *content, int width, int height)
+{
+	for (int step = 0; step < width * height * 3; step += 3)
+	{
+		uint32_t rgb32 = (content[step + 2]) << 16
+			| (content[step + 1]) << 8
+			| (content[step + 0]);
+
+		*(unsigned int *)(image + (step / 3) * 4) = rgb32;
+	}
+}
+
+void	appendImage888(const char *content, int width, int height)
+{
+	int bpp = 0, size_line = 0, endian = 0;
+
+	void *img_ptr = mlx_new_image(g_data.mlx_ptr, width, height);
+	if (!img_ptr)
+	{
+		printf("Error: Unable to create image\n");
+		cleanExit(1);
+	}
+
+	char *data_ptr = mlx_get_data_addr(img_ptr, &bpp, &size_line, &endian);
+
+	fillImage888(data_ptr, (unsigned char *) content, width, height);
+
+	t_list *node = createNode(img_ptr, data_ptr, width, height);
+
+	if (!node)
+	{
+		printf("Error: Unable to create node\n");
+		mlx_destroy_image(g_data.mlx_ptr, img_ptr);
+		cleanExit(1);
+	}
+
+	appendNode(&g_data, node);
+}
+
+void	fillImage555(char *image, const unsigned char *content, int width, int height)
 {
 	for (int step = 0; step < width * height * 2; step += 2)
 	{
-		uint32_t rgb16 = TO_INT(content[step + 1]) << 8 | TO_INT(content[step]);
+		uint32_t rgb16 = (content[step]) << 8 | (content[step + 1]);
 
-		int r = rgb16 >> 10 & 0x1F;
-		int g = rgb16 >> 5 & 0x1F;
+		int r = (rgb16 >> 10) & 0x1F;
+		int g = (rgb16 >> 5) & 0x1F;
 		int b = rgb16 & 0x1F;
 
-		unsigned int rgb32 = (r * 255) / 31 << 16 | (g * 255) / 31 << 8 | (b * 255) / 31;
+		uint32_t rgb32 = (r * 255) / 31 * 0x10000 | (g * 255) / 31 * 0x100 | (b * 255) / 31;
 		*(unsigned int *)(image + step * 2) = rgb32;
 	}
 }
@@ -57,7 +96,7 @@ void	appendImage555(const char *content, int width, int height)
 
 	char *data_ptr = mlx_get_data_addr(img_ptr, &bpp, &size_line, &endian);
 
-	fillImage555(data_ptr, content, width, height);
+	fillImage555(data_ptr, (unsigned char *)content, width, height);
 
 	t_list *node = createNode(img_ptr, data_ptr, width, height);
 
@@ -143,18 +182,46 @@ int main(int argc, char **argv)
 		cleanExit(1);
 	}
 
+	int images = 0;
 	for (size_t i = 3; i < g_data.input.size; ++i)
 	{
+		if (images >= 100)
+		{
+			break;
+		}
 		if ((g_data.input.content[i - 3] == 0 && g_data.input.content[i - 2] == 6)
 			&& (g_data.input.content[i - 1] == 16 && g_data.input.content[i] == 0))
 		{
-			appendImage555(g_data.input.content + i,
-				TO_INT(g_data.input.content[i - 6]) + (TO_INT(g_data.input.content[i - 5]) << 8),
-				TO_INT(g_data.input.content[i - 4]) + (TO_INT(g_data.input.content[i - 3]) << 8));
+			if (TO_INT(g_data.input.content[i - 6]) + (TO_INT(g_data.input.content[i - 5]) << 8) <= 0
+				|| TO_INT(g_data.input.content[i - 4]) + (TO_INT(g_data.input.content[i - 3]) << 8) <= 0)
+			{
+				printf("Error: Invalid image size\n");
+			}
+			else
+			{
+				appendImage555(g_data.input.content + i + 17,
+					TO_INT(g_data.input.content[i - 6]) + (TO_INT(g_data.input.content[i - 5]) << 8),
+					TO_INT(g_data.input.content[i - 4]) + (TO_INT(g_data.input.content[i - 3]) << 8));
+				images++;
+			}
+		}
+		if ((g_data.input.content[i - 3] == 0 && g_data.input.content[i - 2] == 4)
+			&& (g_data.input.content[i - 1] == 16 && g_data.input.content[i] == 0))
+		{
+			if (TO_INT(g_data.input.content[i - 6]) + (TO_INT(g_data.input.content[i - 5]) << 8) <= 0
+				|| TO_INT(g_data.input.content[i - 4]) + (TO_INT(g_data.input.content[i - 3]) << 8) <= 0)
+			{
+				printf("Error: Invalid image size\n");
+			}
+			else
+			{
+				appendImage888(g_data.input.content + i + 17,
+					TO_INT(g_data.input.content[i - 6]) + (TO_INT(g_data.input.content[i - 5]) << 8),
+					TO_INT(g_data.input.content[i - 4]) + (TO_INT(g_data.input.content[i - 3]) << 8));
+				images++;
+			}
 		}
 	}
-
-	signal(SIGINT, singalHandler);
 
 	executeImages();
 
