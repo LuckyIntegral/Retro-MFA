@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vfrants <vfrants@student.42vienna.com>     +#+  +:+       +#+        */
+/*   By: miheider <miheider@42>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 23:16:29 by vfrants           #+#    #+#             */
-/*   Updated: 2024/03/17 19:21:02 by vfrants          ###   ########.fr       */
+/*   Updated: 2024/03/17 21:47:22 by miheider         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,10 +109,18 @@ void singalHandler(int signum)
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+
+	if (argc != 2 || argv[1] == NULL || argv[1][0] == '\0')
 	{
 		printf("Usage: ./%s <filename>\n", argv[0]);
 		return 1;
+	}
+
+	char *extension = strrchr(argv[1], '.');
+	if (strncmp(extension, ".mfa", 4) != 0 || (strlen(argv[1]) <= 4) || strlen(extension) < 4)
+	{
+		printf("Error: only '.mfa' files.\n");
+		exit(1);
 	}
 
 	g_data.mlx_ptr = mlx_init();
